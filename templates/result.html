@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diagnostic Report</title>
+    <style>
+        .graph { margin-bottom: 30px; border-bottom: 1px solid #ccc; padding-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🚗 Vehicle Diagnostic Report</h1>
+    <form method="POST" action="/download">
+        <input type="hidden" name="report_html" value="{{ report | tojson | safe }}">
+        <button type="submit">📥 Download Report as PDF</button>
+    </form>
+
+    <div>
+        <h2>📋 Report</h2>
+        <p>{{ report | safe }}</p>
+    </div>
+
+    <hr>
+    <h2>📊 Visual Graphs</h2>
+    {% for graph, explanation in graphs %}
+        <div class="graph">
+            {{ graph | safe }}
+            <p><strong>Insights:</strong> {{ explanation }}</p>
+        </div>
+    {% endfor %}
+</body>
+</html>

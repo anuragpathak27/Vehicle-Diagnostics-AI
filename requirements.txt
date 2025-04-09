@@ -1,0 +1,10 @@
+Flask
+pandas
+openai
+langchain
+langchain_community
+fpdf2
+matplotlib
+plotly
+xhtml2pdf
+weasyprint

@@ -17,7 +17,7 @@ app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
 os.environ["OPENAI_API_KEY"] = ""  # Replace with your key
 
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a highly knowledgeable vehicle diagnostic assistant."),
+    ("system", "You are an expert vehicle diagnostics assistant. Given raw OBD-II sensor readings, write comprehensive diagnostic reports in a professional tone, similar to what an experienced auto mechanic would write. Your report should include technical insights, inferred issues, possible causes, and preventative advice. Provide detailed explanations with clear reasoning."),
     ("user", "Question: {question}")
 ])
 

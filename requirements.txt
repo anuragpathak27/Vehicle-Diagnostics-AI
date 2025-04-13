@@ -8,3 +8,4 @@ matplotlib
 plotly
 xhtml2pdf
 weasyprint
+langchain_openai

@@ -2,21 +2,25 @@
 <html>
 <head>
     <title>Diagnostic Report</title>
-    <style>
-        .graph { margin-bottom: 30px; border-bottom: 1px solid #ccc; padding-bottom: 20px; }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>🚗 Vehicle Diagnostic Report</h1>
+
     <form method="POST" action="/download">
         <input type="hidden" name="report_html" value="{{ report | tojson | safe }}">
         <button type="submit">📥 Download Report as PDF</button>
     </form>
 
     <div>
-        <h2>📋 Report</h2>
-        <p>{{ report | safe }}</p>
+        <h2>📊 Summary Table</h2>
+        <div>{{ summary_table | safe }}</div>
     </div>
+    
+    <div>
+        <h2>📋 Detailed Diagnostic Report</h2>
+        <p>{{ report | safe }}</p>
+    </div>    
 
     <hr>
     <h2>📊 Visual Graphs</h2>

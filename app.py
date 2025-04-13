@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import tempfile
 import plotly.graph_objs as go
-from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain.schema import StrOutputParser
 from xhtml2pdf import pisa
@@ -60,7 +60,39 @@ Data Summary:
 def generate_report(question):
     llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7, max_tokens=1024)
     chain = prompt | llm | StrOutputParser()
-    return chain.invoke({"question": question})
+    raw_report = chain.invoke({"question": question})
+    formatted_report = f"""
+    <div style='border:2px solid #007BFF; padding:20px; background-color:#F8F9FA; border-radius:10px;'>
+        <h3 style='color:#007BFF;'>Vehicle Diagnostic Report</h3>
+        <p style='white-space:pre-wrap;'>{raw_report}</p>
+    </div>
+    """
+    return Markup(formatted_report)
+
+def generate_summary_table(summary):
+    table_html = """
+    <table style='width:100%; border-collapse: collapse; margin-bottom: 20px;'>
+        <thead>
+            <tr style='background-color:#007BFF; color:white;'>
+                <th style='padding: 8px; border: 1px solid #ddd;'>Metric</th>
+                <th style='padding: 8px; border: 1px solid #ddd;'>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Avg Engine Coolant Temp</td><td>{engine_temp_avg} °C</td></tr>
+            <tr><td>Max Engine RPM</td><td>{rpm_max} RPM</td></tr>
+            <tr><td>Avg Engine RPM</td><td>{rpm_avg} RPM</td></tr>
+            <tr><td>Max Speed</td><td>{speed_max} km/h</td></tr>
+            <tr><td>Avg Air Flow (MAF)</td><td>{maf_avg} g/s</td></tr>
+            <tr><td>Max Throttle Position</td><td>{throttle_max} %</td></tr>
+            <tr><td>Min Ambient Temp</td><td>{ambient_min} °C</td></tr>
+            <tr><td>Avg Intake Air Temp</td><td>{intake_temp_avg} °C</td></tr>
+            <tr><td>Pedal D Range</td><td>{pedal_d_range[0]}% - {pedal_d_range[1]}%</td></tr>
+            <tr><td>Pedal E Range</td><td>{pedal_e_range[0]}% - {pedal_e_range[1]}%</td></tr>
+        </tbody>
+    </table>
+    """.format(**summary)
+    return Markup(table_html)
 
 def create_graph(df, x_col, y_col, title, explanation):
     fig = go.Figure()
@@ -101,8 +133,10 @@ def generate():
     graphs.append(create_graph(df, 'Time', 'Engine RPM [RPM]', 'Engine RPM Over Time', 'Shows engine revolutions per minute during operation.'))
     graphs.append(create_graph(df, 'Time', 'Vehicle Speed Sensor [km/h]', 'Vehicle Speed Over Time', 'Helps assess speed behavior.'))
     graphs.append(create_graph(df, 'Time', 'Accelerator Pedal Position D [%]', 'Pedal D Position Over Time', 'Reflects throttle input from driver.'))
+    
+    summary_table = generate_summary_table(summary)
 
-    return render_template("result.html", report=report, graphs=graphs)
+    return render_template("result.html", report=report, graphs=graphs, summary_table=summary_table)
 
 @app.route('/download', methods=['POST'])
 def download():
